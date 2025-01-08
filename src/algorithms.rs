@@ -1,6 +1,7 @@
 use crate::errors::{Error, ErrorKind, Result};
+use crate::std_lib::str::FromStr;
+
 use serde::{Deserialize, Serialize};
-use std::str::FromStr;
 
 #[derive(Debug, Eq, PartialEq, Copy, Clone, Serialize, Deserialize)]
 pub(crate) enum AlgorithmFamily {
@@ -67,6 +68,7 @@ impl FromStr for Algorithm {
 }
 
 impl Algorithm {
+    #[cfg(feature = "crypto")]
     pub(crate) fn family(self) -> AlgorithmFamily {
         match self {
             Algorithm::HS256 | Algorithm::HS384 | Algorithm::HS512 => AlgorithmFamily::Hmac,

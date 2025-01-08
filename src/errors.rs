@@ -1,7 +1,7 @@
+#[cfg(feature = "std")]
 use std::error::Error as StdError;
-use std::fmt;
-use std::result;
-use std::sync::Arc;
+
+use crate::std_lib::{boxed::Box, fmt, result, sync::Arc};
 
 /// A crate private constructor for `Error`.
 pub(crate) fn new_error(kind: ErrorKind) -> Error {
@@ -42,7 +42,7 @@ pub enum ErrorKind {
     /// When the secret given is not a valid ECDSA key
     InvalidEcdsaKey,
     /// When the secret given is not a valid RSA key
-    InvalidRsaKey(String),
+    InvalidRsaKey(crate::std_lib::string::String),
     /// We could not sign with the given key
     RsaFailedSigning,
     /// When the algorithm from string doesn't match the one passed to `from_str`
@@ -52,7 +52,7 @@ pub enum ErrorKind {
 
     // Validation errors
     /// When a claim required by the validation is not present
-    MissingRequiredClaim(String),
+    MissingRequiredClaim(crate::std_lib::string::String),
     /// When a token’s `exp` claim indicates that it has expired
     ExpiredSignature,
     /// When a token’s `iss` claim does not match the expected issuer
@@ -75,11 +75,13 @@ pub enum ErrorKind {
     /// An error happened while serializing/deserializing JSON
     Json(Arc<serde_json::Error>),
     /// Some of the text was invalid UTF-8
-    Utf8(::std::string::FromUtf8Error),
+    Utf8(crate::std_lib::string::FromUtf8Error),
+    #[cfg(feature = "crypto")]
     /// Something unspecified went wrong with crypto
     Crypto(::ring::error::Unspecified),
 }
 
+#[cfg(feature = "std")]
 impl StdError for Error {
     fn cause(&self) -> Option<&dyn StdError> {
         match &*self.0 {
@@ -101,6 +103,7 @@ impl StdError for Error {
             ErrorKind::Base64(err) => Some(err),
             ErrorKind::Json(err) => Some(err.as_ref()),
             ErrorKind::Utf8(err) => Some(err),
+            #[cfg(feature = "crypto")]
             ErrorKind::Crypto(err) => Some(err),
         }
     }
@@ -126,6 +129,7 @@ impl fmt::Display for Error {
             ErrorKind::InvalidRsaKey(msg) => write!(f, "RSA key invalid: {}", msg),
             ErrorKind::Json(err) => write!(f, "JSON error: {}", err),
             ErrorKind::Utf8(err) => write!(f, "UTF-8 error: {}", err),
+            #[cfg(feature = "crypto")]
             ErrorKind::Crypto(err) => write!(f, "Crypto error: {}", err),
             ErrorKind::Base64(err) => write!(f, "Base64 error: {}", err),
         }
@@ -134,7 +138,7 @@ impl fmt::Display for Error {
 
 impl PartialEq for ErrorKind {
     fn eq(&self, other: &Self) -> bool {
-        format!("{:?}", self) == format!("{:?}", other)
+        crate::std_lib::format!("{:?}", self) == crate::std_lib::format!("{:?}", other)
     }
 }
 
@@ -153,18 +157,19 @@ impl From<serde_json::Error> for Error {
     }
 }
 
-impl From<::std::string::FromUtf8Error> for Error {
-    fn from(err: ::std::string::FromUtf8Error) -> Error {
+impl From<crate::std_lib::string::FromUtf8Error> for Error {
+    fn from(err: crate::std_lib::string::FromUtf8Error) -> Error {
         new_error(ErrorKind::Utf8(err))
     }
 }
 
+#[cfg(feature = "crypto")]
 impl From<::ring::error::Unspecified> for Error {
     fn from(err: ::ring::error::Unspecified) -> Error {
         new_error(ErrorKind::Crypto(err))
     }
 }
-
+#[cfg(feature = "crypto")]
 impl From<::ring::error::KeyRejected> for Error {
     fn from(_err: ::ring::error::KeyRejected) -> Error {
         new_error(ErrorKind::InvalidEcdsaKey)

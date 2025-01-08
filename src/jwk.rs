@@ -9,7 +9,13 @@ use crate::{
     Algorithm,
 };
 use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
-use std::{fmt, str::FromStr};
+
+use crate::std_lib::{
+    fmt,
+    str::FromStr,
+    string::{String, ToString},
+    vec::Vec,
+};
 
 /// The intended usage of the public `KeyType`. This enum is serialized `untagged`
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]

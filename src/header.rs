@@ -1,4 +1,8 @@
-use std::result;
+use crate::std_lib::{
+    result,
+    string::{String, ToString},
+    vec::Vec,
+};
 
 use base64::{engine::general_purpose::STANDARD, Engine};
 use serde::{Deserialize, Serialize};
@@ -6,6 +10,7 @@ use serde::{Deserialize, Serialize};
 use crate::algorithms::Algorithm;
 use crate::errors::Result;
 use crate::jwk::Jwk;
+#[cfg(feature = "crypto")]
 use crate::serialization::b64_decode;
 
 /// A basic JWT header, the alg defaults to HS256 and typ is automatically
@@ -84,6 +89,7 @@ impl Header {
     }
 
     /// Converts an encoded part into the Header struct if possible
+    #[cfg(feature = "crypto")]
     pub(crate) fn from_encoded<T: AsRef<[u8]>>(encoded_part: T) -> Result<Self> {
         let decoded = b64_decode(encoded_part)?;
         Ok(serde_json::from_slice(&decoded)?)
