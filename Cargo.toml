@@ -27,6 +27,10 @@ base64 = { version = "0.21.0", features = ["alloc"], default-features = false }
 pem = { version = "3", optional = true }
 simple_asn1 = { version = "0.6", optional = true }
 
+# parity scale-codec support
+parity-scale-codec = { version = "3.6.12", features = ["derive"], default-features = false, optional = true }
+scale-info = { version = "2.11.6", features = ["derive"], default-features = false, optional = true }
+
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 ring = { version = "0.17.4", features = ["std"] }
 
@@ -53,6 +57,7 @@ use_pem = ["pem", "simple_asn1"]
 crypto = ["validation"]
 validation = []
 wasm-js = [ "js-sys", "ring" ]
+codec = ["parity-scale-codec", "scale-info"]
 std = [
     "base64/std",
     "serde/default",

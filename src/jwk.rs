@@ -17,8 +17,14 @@ use crate::std_lib::{
     vec::Vec,
 };
 
+#[cfg(feature = "codec")]
+use parity_scale_codec::{Decode, Encode};
+#[cfg(feature = "codec")]
+use scale_info::TypeInfo;
+
 /// The intended usage of the public `KeyType`. This enum is serialized `untagged`
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
+#[cfg_attr(feature = "codec", derive(Decode, Encode, TypeInfo))]
 pub enum PublicKeyUse {
     /// Indicates a public key is meant for signature verification
     Signature,
@@ -74,6 +80,7 @@ impl<'de> Deserialize<'de> for PublicKeyUse {
 
 /// Operations that the key is intended to be used for. This enum is serialized `untagged`
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
+#[cfg_attr(feature = "codec", derive(Decode, Encode, TypeInfo))]
 pub enum KeyOperations {
     /// Computer digital signature or MAC
     Sign,
@@ -154,6 +161,7 @@ impl<'de> Deserialize<'de> for KeyOperations {
 /// The algorithms of the keys
 #[allow(non_camel_case_types, clippy::upper_case_acronyms)]
 #[derive(Debug, PartialEq, Eq, Hash, Copy, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "codec", derive(Decode, Encode, TypeInfo))]
 pub enum KeyAlgorithm {
     /// HMAC using SHA-256
     HS256,
@@ -234,6 +242,7 @@ impl KeyAlgorithm {
 
 /// Common JWK parameters
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, Default, Hash)]
+#[cfg_attr(feature = "codec", derive(Decode, Encode, TypeInfo))]
 pub struct CommonParameters {
     /// The intended use of the public key. Should not be specified with `key_operations`.
     /// See sections 4.2 and 4.3 of [RFC7517](https://tools.ietf.org/html/rfc7517).
@@ -285,6 +294,7 @@ pub struct CommonParameters {
 /// Key type value for an Elliptic Curve Key.
 /// This single value enum is a workaround for Rust not supporting associated constants.
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq, Serialize, Deserialize, Hash)]
+#[cfg_attr(feature = "codec", derive(Decode, Encode, TypeInfo))]
 pub enum EllipticCurveKeyType {
     /// Key type value for an Elliptic Curve Key.
     #[default]
@@ -294,6 +304,7 @@ pub enum EllipticCurveKeyType {
 /// Type of cryptographic curve used by a key. This is defined in
 /// [RFC 7518 #7.6](https://tools.ietf.org/html/rfc7518#section-7.6)
 #[derive(Clone, Debug, Default, Eq, PartialEq, Serialize, Deserialize, Hash)]
+#[cfg_attr(feature = "codec", derive(Decode, Encode, TypeInfo))]
 pub enum EllipticCurve {
     /// P-256 curve
     #[serde(rename = "P-256")]
@@ -312,6 +323,7 @@ pub enum EllipticCurve {
 
 /// Parameters for an Elliptic Curve Key
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize, Default, Hash)]
+#[cfg_attr(feature = "codec", derive(Decode, Encode, TypeInfo))]
 pub struct EllipticCurveKeyParameters {
     /// Key type value for an Elliptic Curve Key.
     #[serde(rename = "kty")]
@@ -331,6 +343,7 @@ pub struct EllipticCurveKeyParameters {
 /// Key type value for an RSA Key.
 /// This single value enum is a workaround for Rust not supporting associated constants.
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq, Serialize, Deserialize, Hash)]
+#[cfg_attr(feature = "codec", derive(Decode, Encode, TypeInfo))]
 pub enum RSAKeyType {
     /// Key type value for an RSA Key.
     #[default]
@@ -339,6 +352,7 @@ pub enum RSAKeyType {
 
 /// Parameters for a RSA Key
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize, Default, Hash)]
+#[cfg_attr(feature = "codec", derive(Decode, Encode, TypeInfo))]
 pub struct RSAKeyParameters {
     /// Key type value for a RSA Key
     #[serde(rename = "kty")]
@@ -356,6 +370,7 @@ pub struct RSAKeyParameters {
 /// Key type value for an Octet symmetric key.
 /// This single value enum is a workaround for Rust not supporting associated constants.
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq, Serialize, Deserialize, Hash)]
+#[cfg_attr(feature = "codec", derive(Decode, Encode, TypeInfo))]
 pub enum OctetKeyType {
     /// Key type value for an Octet symmetric key.
     #[serde(rename = "oct")]
@@ -365,6 +380,7 @@ pub enum OctetKeyType {
 
 /// Parameters for an Octet Key
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize, Default, Hash)]
+#[cfg_attr(feature = "codec", derive(Decode, Encode, TypeInfo))]
 pub struct OctetKeyParameters {
     /// Key type value for an Octet Key
     #[serde(rename = "kty")]
@@ -377,6 +393,7 @@ pub struct OctetKeyParameters {
 /// Key type value for an Octet Key Pair.
 /// This single value enum is a workaround for Rust not supporting associated constants.
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq, Serialize, Deserialize, Hash)]
+#[cfg_attr(feature = "codec", derive(Decode, Encode, TypeInfo))]
 pub enum OctetKeyPairType {
     /// Key type value for an Octet Key Pair.
     #[serde(rename = "OKP")]
@@ -386,6 +403,7 @@ pub enum OctetKeyPairType {
 
 /// Parameters for an Octet Key Pair
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize, Default, Hash)]
+#[cfg_attr(feature = "codec", derive(Decode, Encode, TypeInfo))]
 pub struct OctetKeyPairParameters {
     /// Key type value for an Octet Key Pair
     #[serde(rename = "kty")]
@@ -401,6 +419,7 @@ pub struct OctetKeyPairParameters {
 /// Algorithm specific parameters
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize, Hash)]
 #[serde(untagged)]
+#[cfg_attr(feature = "codec", derive(Decode, Encode, TypeInfo))]
 pub enum AlgorithmParameters {
     EllipticCurve(EllipticCurveKeyParameters),
     RSA(RSAKeyParameters),
@@ -409,6 +428,7 @@ pub enum AlgorithmParameters {
 }
 
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize, Hash)]
+#[cfg_attr(feature = "codec", derive(Decode, Encode, TypeInfo))]
 pub struct Jwk {
     #[serde(flatten)]
     pub common: CommonParameters,
